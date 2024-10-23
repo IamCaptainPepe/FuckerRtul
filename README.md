@@ -13,7 +13,7 @@
 
 Запуск
 
-`mkdir -p ~/FuckerRitual && cd ~/FuckerRitual/FuckerRtul && git clone https://github.com/IamCaptainPepe/FuckerRtul.git`
+`git clone https://github.com/IamCaptainPepe/FuckerRtul.git && cd ~/FuckerRtul`
 
 Добавляем приватки, меняем настрйоки если надо и запускаем либо в скрине, либо через команду
 
