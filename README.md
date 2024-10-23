@@ -11,5 +11,7 @@
 
 Циклический мониторинг: Скрипт работает в бесконечном цикле и выполняет указанные проверки каждую минуту. Он завершает свою работу только в случае, если все приватные ключи были использованы.
 
+Запуск
 
+`mkdir -p ~/my_project && cd ~/my_project && git clone https://github.com/IamCaptainPepe/FuckerRtul.git && cd FuckerRtul && ./setup.sh`
 
