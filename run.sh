@@ -15,13 +15,18 @@ if ! command -v pip &>/dev/null; then
     exit 1
 fi
 
+# Проверяем, установлен ли screen
+if ! command -v screen &>/dev/null; then
+    echo "screen не установлен. Установите его командой: sudo apt install screen"
+    exit 1
+fi
+
 # Создаем виртуальное окружение
 if [ ! -d "$VENV_NAME" ]; then
     echo "Создаем виртуальное окружение..."
     python3 -m venv "$VENV_NAME"
 else
-    echo "Виртуальное окружение уже существует. Удалите директорию $VENV_NAME, если хотите создать новое."
-    exit 1
+    echo "Виртуальное окружение уже существует."
 fi
 
 # Активируем виртуальное окружение
@@ -33,9 +38,18 @@ if [ -f "requirements.txt" ]; then
     echo "Устанавливаем зависимости из requirements.txt..."
     pip install -r requirements.txt
 else
-    echo "Файл requirements.txt не найден. Убедитесь, что он находится в том же каталоге, что и скрипт."
+    echo "Файл requirements.txt не найден."
     exit 1
 fi
 
-echo "Настройка завершена. Виртуальное окружение $VENV_NAME активировано."
-echo "Теперь вы можете запускать ваш скрипт с помощью команды: python <ваш_скрипт.py>"
+# Проверка наличия monitor.py
+if [ ! -f "monitor.py" ]; then
+    echo "Скрипт monitor.py не найден."
+    exit 1
+fi
+
+# Запуск monitor.py в screen
+echo "Запускаем monitor.py в screen..."
+screen -dmS monitor_session bash -c "python monitor.py; exec bash"
+
+echo "Настройка завершена. Виртуальное окружение $VENV_NAME активировано и monitor.py запущен в screen сессии 'monitor_session'."
