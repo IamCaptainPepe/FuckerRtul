@@ -34,12 +34,19 @@ containers = [
 # Инициализация Web3
 w3 = Web3(Web3.HTTPProvider("https://rpc.ankr.com/eth"))  # Укажите правильный RPC для сети
 
+# Функция для получения текущего приватного ключа из конфигов
+def get_current_private_key(config_paths):
+    for path in config_paths:
+        with open(path, 'r') as file:
+            config = json.load(file)
+            if "chain" in config and "wallet" in config["chain"]:
+                return config["chain"]["wallet"].get("private_key")
+    return None
 
 # Функция для получения кошелька из приватного ключа
 def get_wallet_address_from_private_key(private_key):
     account = w3.eth.account.from_key(private_key)
     return account.address
-
 
 # Функция для получения всех транзакций аккаунта
 def get_account_transactions(address, api_key):
@@ -52,7 +59,6 @@ def get_account_transactions(address, api_key):
         "sort": "asc",  # Сортировка транзакций по возрастанию
         "apikey": api_key
     }
-
     response = requests.get(BASESCAN_API_URL, params=params)
     if response.status_code == 200:
         data = response.json()
@@ -65,11 +71,9 @@ def get_account_transactions(address, api_key):
         print(f"Ошибка HTTP: {response.status_code}")
         return []
 
-
 # Функция для фильтрации транзакций по методу
 def filter_transactions_by_method(transactions, method_id):
     return [tx for tx in transactions if tx['input'].startswith(method_id)]
-
 
 # Функция для получения баланса в ETH
 def get_account_balance(address, api_key):
@@ -79,7 +83,6 @@ def get_account_balance(address, api_key):
         "address": address,
         "apikey": api_key
     }
-
     response = requests.get(BASESCAN_API_URL, params=params)
     if response.status_code == 200:
         data = response.json()
@@ -94,7 +97,6 @@ def get_account_balance(address, api_key):
         print(f"Ошибка HTTP: {response.status_code}")
         return None
 
-
 # Функция для замены приватного ключа в конфиге
 def update_private_key(config_path, new_private_key):
     with open(config_path, 'r') as file:
@@ -107,27 +109,23 @@ def update_private_key(config_path, new_private_key):
     with open(config_path, 'w') as file:
         json.dump(config, file, indent=4)
 
-
 # Функция для получения первого приватного ключа из txt файла
 def get_first_private_key(private_key_file):
     with open(private_key_file, 'r') as file:
         keys = file.readlines()
-
     if keys:
         first_key = keys[0].strip()
         with open(private_key_file, 'w') as file:
             file.writelines(keys[1:])
         return first_key
     else:
-        raise ValueError("Файл с приватными ключами пуст.")
-
+        return None  # Возвращаем None вместо исключения, если файл пуст
 
 # Функция для добавления использованного приватного ключа в файл
 def add_to_used_private_keys(new_private_key, used_private_keys_file):
     with open(used_private_keys_file, 'a') as used_file:
         used_file.write(new_private_key + "\n")
     print(f"Приватный ключ добавлен в {used_private_keys_file}")
-
 
 # Функция для перезагрузки Docker контейнеров
 def restart_containers(container_names):
@@ -139,16 +137,22 @@ def restart_containers(container_names):
         except subprocess.CalledProcessError as e:
             print(f"Ошибка при перезагрузке контейнера {container}: {e}")
 
-
 # Основной цикл
 def main():
-    while True:
-        try:
-            # Получаем первый приватный ключ из txt файла
+    try:
+        # Получаем текущий приватный ключ
+        new_private_key = get_current_private_key(config_paths)
+        if not new_private_key:
             new_private_key = get_first_private_key(private_key_path)
-            wallet_address = get_wallet_address_from_private_key(new_private_key)
-            print(f"Используемый адрес кошелька: {wallet_address}")
 
+        if not new_private_key:
+            print("Ошибка: ни один приватный ключ не найден.")
+            return
+
+        wallet_address = get_wallet_address_from_private_key(new_private_key)
+        print(f"Используемый адрес кошелька: {wallet_address}")
+
+        while True:
             # Получаем список транзакций
             transactions = get_account_transactions(wallet_address, API_KEY)
             filtered_transactions = filter_transactions_by_method(transactions, METHOD_ID)
@@ -178,22 +182,23 @@ def main():
 
                 # Добавляем использованный ключ в файл использованных ключей
                 add_to_used_private_keys(new_private_key, used_private_keys_path)
+
+                # Пробуем получить новый ключ, если нужно
+                new_private_key = get_first_private_key(private_key_path)
+                if not new_private_key:
+                    print("Ошибка: приватные ключи закончились. Завершаем работу.")
+                    break
+
+                wallet_address = get_wallet_address_from_private_key(new_private_key)
+                print(f"Используемый адрес кошелька: {wallet_address}")
             else:
                 print("Текущий ключ подходит, продолжаем.")
-
-            # Проверка на окончание приватных ключей
-            with open(private_key_path, 'r') as file:
-                remaining_keys = file.readlines()
-            if not remaining_keys:
-                print("Приватные ключи закончились. Завершаем работу.")
-                break
 
             # Ожидание перед следующей проверкой
             time.sleep(CHECK_INTERVAL)
 
-        except Exception as e:
-            print(f"Ошибка: {str(e)}")
-            break
+    except Exception as e:
+        print(f"Ошибка: {str(e)}")
 
 
 if __name__ == "__main__":
