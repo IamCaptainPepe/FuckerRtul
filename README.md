@@ -1,5 +1,5 @@
 # FuckerRtul
-Скрипт предназначен для мониторинга Ethereum-кошелька, используя приватные ключи из текстового файла. Он выполняет следующие функции:
+Скрипт предназначен для мониторинга Base-кошелька, используя приватные ключи из текстового файла. Он выполняет следующие функции:
 
 Получение адреса кошелька: Скрипт извлекает адрес кошелька из приватного ключа, используя библиотеку Web3.
 
@@ -13,5 +13,8 @@
 
 Запуск
 
-`mkdir -p ~/my_project && cd ~/my_project && git clone https://github.com/IamCaptainPepe/FuckerRtul.git && cd FuckerRtul && ./setup.sh`
+`mkdir -p ~/my_project && cd ~/my_project && git clone https://github.com/IamCaptainPepe/FuckerRtul.git`
 
+Добавляем приватки, меняем настрйоки если надо и запускаем либо в скрине, либо через команду
+
+`chmod +x setup.sh && ./setup.sh`
