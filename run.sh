@@ -6,10 +6,10 @@ VENV_NAME="myenv"
 # Обновляем систему и устанавливаем необходимые пакеты
 sudo apt update
 
-# Проверяем, установлен ли Python, и устанавливаем его, если нет
+# Проверяем, установлен ли Python 3, и устанавливаем его, если нет
 if ! command -v python3 &>/dev/null; then
     echo "Python3 не установлен. Устанавливаем Python3..."
-    sudo apt install -y python3
+    sudo apt install -y python3 python3-venv
     if [ $? -ne 0 ]; then
         echo "Ошибка установки Python3."
         exit 1
@@ -17,7 +17,7 @@ if ! command -v python3 &>/dev/null; then
 fi
 
 # Проверяем, установлен ли pip, и устанавливаем его, если нет
-if ! command -v pip &>/dev/null; then
+if ! command -v pip3 &>/dev/null; then
     echo "pip не установлен. Устанавливаем pip..."
     sudo apt install -y python3-pip
     if [ $? -ne 0 ]; then
@@ -65,6 +65,6 @@ fi
 
 # Запуск monitor.py в screen
 echo "Запускаем monitor.py в screen..."
-screen -dmS monitor_session bash -c "python monitor.py; exec bash"
+screen -dmS monitor_session bash -c "python3 monitor.py; exec bash"
 
 echo "Настройка завершена. Виртуальное окружение $VENV_NAME активировано и monitor.py запущен в screen сессии 'monitor_session'."
