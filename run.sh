@@ -3,25 +3,40 @@
 # Название виртуального окружения
 VENV_NAME="myenv"
 
-# Проверяем, установлен ли Python
+# Обновляем систему и устанавливаем необходимые пакеты
+sudo apt update
+
+# Проверяем, установлен ли Python, и устанавливаем его, если нет
 if ! command -v python3 &>/dev/null; then
-    echo "Python3 не установлен. Пожалуйста, установите Python3."
-    exit 1
+    echo "Python3 не установлен. Устанавливаем Python3..."
+    sudo apt install -y python3
+    if [ $? -ne 0 ]; then
+        echo "Ошибка установки Python3."
+        exit 1
+    fi
 fi
 
-# Проверяем, установлен ли pip
+# Проверяем, установлен ли pip, и устанавливаем его, если нет
 if ! command -v pip &>/dev/null; then
-    echo "pip не установлен. Пожалуйста, установите pip."
-    exit 1
+    echo "pip не установлен. Устанавливаем pip..."
+    sudo apt install -y python3-pip
+    if [ $? -ne 0 ]; then
+        echo "Ошибка установки pip."
+        exit 1
+    fi
 fi
 
-# Проверяем, установлен ли screen
+# Проверяем, установлен ли screen, и устанавливаем его, если нет
 if ! command -v screen &>/dev/null; then
-    echo "screen не установлен. Установите его командой: sudo apt install screen"
-    exit 1
+    echo "screen не установлен. Устанавливаем screen..."
+    sudo apt install -y screen
+    if [ $? -ne 0 ]; then
+        echo "Ошибка установки screen."
+        exit 1
+    fi
 fi
 
-# Создаем виртуальное окружение
+# Создаем виртуальное окружение, если его нет
 if [ ! -d "$VENV_NAME" ]; then
     echo "Создаем виртуальное окружение..."
     python3 -m venv "$VENV_NAME"
