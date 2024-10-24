@@ -1,0 +1,11 @@
+api_key=IIB5A6I991FBYFB9YE6CE6QRJWYQZ5GHU6
+base_url=https://api.basescan.org/api
+method_id=0xc509543d
+min_transactions=50
+min_balance=0.00005
+check_interval=60
+config_paths=~/infernet-container-starter/deploy/config.json,~/infernet-container-starter/projects/hello-world/container/config.json
+private_key_file=private_key.txt
+used_private_keys_file=used_private_keys.txt
+web3_provider=https://rpc.ankr.com/eth
+containers=hello-world,infernet-node,deploy-redis-1,infernet-anvil,deploy-fluentbit-1
