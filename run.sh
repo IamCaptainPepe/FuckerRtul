@@ -57,6 +57,6 @@ fi
 
 # Запуск monitor.py
 echo "Запускаем monitor.py..."
-python3 monitor.py
+python3 main.py
 
 echo "Настройка завершена. Виртуальное окружение $VENV_NAME активировано и monitor.py запущен."
