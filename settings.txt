@@ -1,5 +1,5 @@
 config_paths=/root/infernet-container-starter/deploy/config.json,/root/infernet-container-starter/projects/hello-world/container/config.json
-private_key_file=/root/private_key.txt
+private_key_file=/root/FuckerRtul/private_key.txt
 used_private_keys_file=/root/used_private_keys.txt
 api_key=IIB5A6I991FBYFB9YE6CE6QRJWYQZ5GHU6
 base_url=https://api.basescan.org/api
@@ -9,3 +9,7 @@ min_balance=0.00005
 check_interval=60
 web3_provider=https://rpc.ankr.com/eth
 containers=hello-world,infernet-node,deploy-redis-1,infernet-anvil,deploy-fluentbit-1
+deploy_json_path=/root/infernet-container-starter/projects/hello-world/contracts/broadcast/Deploy.s.sol/8453/run-latest.json
+call_contract_path=/root/infernet-container-starter/projects/hello-world/contracts/script/CallContract.s.sol
+deploy_contracts_path=/root/infernet-container-starter/projects/hello-world/contracts
+base_deploy_path=/root/infernet-container-starter
