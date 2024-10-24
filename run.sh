@@ -49,14 +49,8 @@ else
     exit 1
 fi
 
-# Проверка наличия monitor.py
-if [ ! -f "monitor.py" ]; then
-    echo "Скрипт monitor.py не найден."
-    exit 1
-fi
-
-# Запуск monitor.py
-echo "Запускаем monitor.py..."
+# Запуск main.py
+echo "Запускаем main.py..."
 python3 main.py
 
-echo "Настройка завершена. Виртуальное окружение $VENV_NAME активировано и monitor.py запущен."
+echo "Настройка завершена. Виртуальное окружение $VENV_NAME активировано и main.py запущен."
