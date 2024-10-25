@@ -64,11 +64,25 @@ show_header() {
 show_header
 
 
-show_header
-
 # Установка версии образа для первого и второго обновления
 VERSION_1="1.2.0"
 VERSION_2="1.3.1"
+# Путь к файлу settings.txt
+SETTINGS_FILE="./settings.txt"
+
+# Функция для перезагрузки контейнеров
+restart_containers() {
+  echo "Перезагрузка контейнеров..."
+  # Читаем контейнеры из settings.txt
+  CONTAINERS=$(grep "^containers=" "$SETTINGS_FILE" | cut -d'=' -f2)
+
+  # Перебираем каждый контейнер и перезагружаем его
+  IFS=',' # Устанавливаем разделитель для цикла
+  for CONTAINER in $CONTAINERS; do
+    echo "Перезагрузка контейнера: $CONTAINER"
+    docker restart "$CONTAINER"  # Перезагружаем контейнер
+  done
+}
 
 # Путь к файлу docker-compose.yaml
 COMPOSE_FILE="/root/infernet-container-starter/deploy/docker-compose.yaml"
@@ -90,9 +104,11 @@ echo "Проверка наличия файла: $COMPOSE_FILE"
 if [[ -f "$COMPOSE_FILE" ]]; then
   # Обновление и перезагрузка для версии 1.2.0
   update_and_restart "$VERSION_1"
+  restart_containers
 
   # Обновление и перезагрузка для версии 1.3.1
   update_and_restart "$VERSION_2"
+  restart_containers
 else
   echo "Файл $COMPOSE_FILE не найден."
 fi
