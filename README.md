@@ -27,3 +27,12 @@
 
 `screen -r FuckerRtul`
 
+Добавил 
+
+restart_version.sh
+
+Ставит версию 1.2.0, перезагружает докер и возращает 1.3.1 бытует мнение что это поможет отправлять транзы. 
+
+Запуск 
+
+`chmod +x restart_version.sh && ./restart_version.sh`
