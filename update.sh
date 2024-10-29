@@ -21,7 +21,6 @@ MIN_BALANCE="${settings[min_balance]}"
 CHECK_INTERVAL="${settings[check_interval]}"
 WEB3_PROVIDER="${settings[web3_provider]}"
 CONTAINERS="${settings[containers]}"
-DEPLOY_JSON_PATH="${settings[deploy_json_path]}"
 CALL_CONTRACT_PATH="${settings[call_contract_path]}"
 DEPLOY_CONTRACTS_PATH="${settings[deploy_contracts_path]}"
 BASE_DEPLOY_PATH="${settings[base_deploy_path]}"
@@ -109,35 +108,53 @@ project=hello-world make deploy-contracts
 echo "Ожидание завершения деплоя..."
 sleep 30
 
-# Проверка существования файла с результатами деплоя
-if [ -f "$DEPLOY_JSON_PATH" ]; then
-  # Извлечение адреса контракта из JSON-файла
-  CONTRACT_ADDRESS=$(jq -r '.. | objects | select(has("contractAddress")) | .contractAddress' "$DEPLOY_JSON_PATH")
-  if [ -n "$CONTRACT_ADDRESS" ]; then
-    echo "Новый адрес контракта: $CONTRACT_ADDRESS"
-
-    # Обновление файла CallContract.s.sol новым адресом контракта
-    if [ -f "$CALL_CONTRACT_PATH" ]; then
-      echo "Обновление файла CallContract.s.sol новым адресом контракта..."
-      # Обновление строки с адресом контракта
-      sed -i "s/\(SaysGM saysGm = SaysGM(\).*\();\)/\1$CONTRACT_ADDRESS\2/" "$CALL_CONTRACT_PATH"
-    else
-      echo "Файл CallContract.s.sol не найден по пути $CALL_CONTRACT_PATH"
-    fi
-
-    # Ожидание перед вызовом метода контракта
-    echo "Ожидание перед вызовом метода контракта..."
-    sleep 10
-
-    # Вызов метода контракта
-    echo "Вызов метода контракта..."
-    project=hello-world make call-contract
-
+# Поиск последнего JSON-файла с результатами деплоя
+echo "Поиск последнего файла с результатами деплоя..."
+DEPLOY_OUTPUT_DIR="$BASE_DEPLOY_PATH/projects/hello-world/contracts/broadcast/Deploy.s.sol"
+if [ -d "$DEPLOY_OUTPUT_DIR" ]; then
+  # Находим самую новую папку (предположительно, с наибольшим номером Chain ID)
+  LATEST_CHAIN_ID_DIR=$(find "$DEPLOY_OUTPUT_DIR" -maxdepth 1 -type d | sort -nr | head -n 1)
+  if [ -z "$LATEST_CHAIN_ID_DIR" ]; then
+    echo "Не удалось найти директорию с результатами деплоя."
+    exit 1
+  fi
+  # Путь к последнему JSON-файлу
+  DEPLOY_JSON_PATH="$LATEST_CHAIN_ID_DIR/run-latest.json"
+  if [ -f "$DEPLOY_JSON_PATH" ]; then
+    echo "Файл с результатами деплоя найден: $DEPLOY_JSON_PATH"
   else
-    echo "Адрес нового контракта не найден в $DEPLOY_JSON_PATH"
+    echo "Файл run-latest.json не найден в $LATEST_CHAIN_ID_DIR"
+    exit 1
   fi
 else
-  echo "Файл результатов деплоя не найден по пути $DEPLOY_JSON_PATH"
+  echo "Директория $DEPLOY_OUTPUT_DIR не найдена."
+  exit 1
+fi
+
+# Извлечение адреса контракта из JSON-файла
+CONTRACT_ADDRESS=$(jq -r '.. | objects | select(has("contractAddress")) | .contractAddress' "$DEPLOY_JSON_PATH" | head -n 1)
+if [ -n "$CONTRACT_ADDRESS" ]; then
+  echo "Новый адрес контракта: $CONTRACT_ADDRESS"
+
+  # Обновление файла CallContract.s.sol новым адресом контракта
+  if [ -f "$CALL_CONTRACT_PATH" ]; then
+    echo "Обновление файла CallContract.s.sol новым адресом контракта..."
+    # Обновление строки с адресом контракта
+    sed -i "s/\(SaysGM saysGm = SaysGM(\).*\();\)/\1$CONTRACT_ADDRESS\2/" "$CALL_CONTRACT_PATH"
+  else
+    echo "Файл CallContract.s.sol не найден по пути $CALL_CONTRACT_PATH"
+  fi
+
+  # Ожидание перед вызовом метода контракта
+  echo "Ожидание перед вызовом метода контракта..."
+  sleep 10
+
+  # Вызов метода контракта
+  echo "Вызов метода контракта..."
+  project=hello-world make call-contract
+
+else
+  echo "Адрес нового контракта не найден в $DEPLOY_JSON_PATH"
 fi
 
 # Перезапуск контейнеров
