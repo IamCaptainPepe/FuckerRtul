@@ -44,10 +44,17 @@ if ! command -v foundryup &> /dev/null; then
 
   # Установка Foundry
   curl -L https://foundry.paradigm.xyz | bash
-  source ~/.bashrc
+
+  # Обновление PATH внутри скрипта
+  export PATH="$HOME/.foundry/bin:$PATH"
+
+  # Установка Foundry с помощью foundryup
   foundryup
 else
   echo "Foundry уже установлен."
+
+  # Обновление PATH внутри скрипта (на случай, если Foundry был установлен ранее)
+  export PATH="$HOME/.foundry/bin:$PATH"
 fi
 
 # 2. Клонирование репозитория, если директория не существует
@@ -124,7 +131,7 @@ fi
 DEPLOY_SOL_FILE="$BASE_DEPLOY_PATH/projects/hello-world/contracts/script/Deploy.s.sol"
 if [ -f "$DEPLOY_SOL_FILE" ]; then
   echo "Обновление файла Deploy.s.sol..."
-  sed -i "s/address registry =.*/address registry = $REGISTRY_ADDRESS;/" "$DEPLOY_SOL_FILE"
+  sed -i "s|address registry =.*;|address registry = $REGISTRY_ADDRESS;|" "$DEPLOY_SOL_FILE"
 else
   echo "Файл Deploy.s.sol не найден."
 fi
