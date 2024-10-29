@@ -26,7 +26,7 @@ CALL_CONTRACT_PATH="${settings[call_contract_path]}"
 DEPLOY_CONTRACTS_PATH="${settings[deploy_contracts_path]}"
 BASE_DEPLOY_PATH="${settings[base_deploy_path]}"
 
-# Запрос приватного ключа у пользователя (перемещено в начало)
+# Запрос приватного ключа у пользователя
 read -s -p "Введите ваш приватный ключ: " PRIVATE_KEY
 echo
 
@@ -116,11 +116,15 @@ if [ -f "$DEPLOY_JSON_PATH" ]; then
   if [ -n "$CONTRACT_ADDRESS" ]; then
     echo "Новый адрес контракта: $CONTRACT_ADDRESS"
 
+    # Преобразование адреса в формат с контрольной суммой (checksummed address)
+    CHECKSUMMED_ADDRESS=$(python3 -c "from web3 import Web3; print(Web3.toChecksumAddress('$CONTRACT_ADDRESS'))")
+    echo "Адрес контракта в checksummed формате: $CHECKSUMMED_ADDRESS"
+
     # Обновление файла CallContract.s.sol новым адресом контракта
     if [ -f "$CALL_CONTRACT_PATH" ]; then
       echo "Обновление файла CallContract.s.sol новым адресом контракта..."
-      # Обновление строки с адресом контракта
-      sed -i "s/\(SaysGM saysGm = SaysGM(\).*\();\)/\1$CONTRACT_ADDRESS\2/" "$CALL_CONTRACT_PATH"
+      # Используем более точное регулярное выражение и другой разделитель
+      sed -i "s|\(SaysGM saysGm = SaysGM(\).*);\|\1$CHECKSUMMED_ADDRESS);|" "$CALL_CONTRACT_PATH"
     else
       echo "Файл CallContract.s.sol не найден по пути $CALL_CONTRACT_PATH"
     fi
