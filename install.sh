@@ -69,6 +69,7 @@ cd "$BASE_DEPLOY_PATH" || { echo "Не удалось перейти в дире
 # 3. Удаление проблемных директорий
 echo "Удаление проблемных директорий..."
 rm -rf projects/hello-world/contracts/lib/forge-std
+rm -rf projects/hello-world/contracts/lib/infernet-sdk
 rm -rf lib/forge-std
 
 # 4. Инициализация проекта и установка зависимостей
