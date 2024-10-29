@@ -1,7 +1,8 @@
 config_paths=/root/infernet-container-starter/deploy/config.json,/root/infernet-container-starter/projects/hello-world/container/config.json
-private_key_file=/root/FuckerRtul/private_key.txt
+makefile_path=/root/infernet-container-starter/projects/hello-world/contracts/Makefile
+private_key_file=/root/ПУТЬ_К_ПРИВАТНОМУ_КЛЮЧУ/private_key.txt
 used_private_keys_file=/root/used_private_keys.txt
-api_key=IIB5A6I991FBYFB9YE6CE6QRJWYQZ5GHU6
+api_key=ВАШ_API_KEY
 base_url=https://api.basescan.org/api
 method_id=0xc509543d
 min_transactions=50
