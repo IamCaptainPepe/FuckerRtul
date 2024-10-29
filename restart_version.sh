@@ -66,7 +66,7 @@ show_header
 
 # Установка версии образа для первого и второго обновления
 VERSION_1="1.2.0"
-VERSION_2="1.3.1"
+VERSION_2="1.4.0"
 # Путь к файлу settings.txt
 SETTINGS_FILE="./settings.txt"
 
